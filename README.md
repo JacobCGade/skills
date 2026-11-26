@@ -4,31 +4,35 @@ A harness-agnostic engineering workflow for any coding agent (GitHub Copilot CLI
 
 ## Install
 
+**As a plugin** (once the repo is on GitHub):
+
+| Harness | Install |
+|---|---|
+| Claude Code | `/plugin marketplace add JacobCGade/skills`, then `/plugin install agent-workflow@jacobcgade-skills` |
+| Copilot CLI | `/plugin marketplace add JacobCGade/skills`, then `copilot plugin install agent-workflow@jacobcgade-skills` |
+| Codex | add the repo as a plugin source in Codex |
+
+<!-- Maintainers: keep the version in plugin.json, .claude-plugin/*.json, .codex-plugin/plugin.json and .github/plugin/marketplace.json in step. -->
+
+**Or with the installer**, which also works from a local checkout:
+
 ```bash
-./install.sh                      # copy skills into ~/.agents/skills (Copilot CLI and Codex read it)
+./install.sh                      # skills into ~/.agents/skills
 ./install.sh --link               # symlink instead, so edits here apply live
 ./install.sh --harness claude     # also wire ~/.claude/skills and ~/.claude/agents
 ./install.sh --harness copilot    # also install the custom agents to ~/.copilot/agents
 ./install.sh --harness all
 ```
 
-Then, in your harness:
+| | Copilot CLI | Codex | Claude Code |
+|---|---|---|---|
+| Skills | `~/.agents/skills` | `~/.agents/skills` | `~/.claude/skills` (`--harness claude`) |
+| Repo conventions | `AGENTS.md` | `AGENTS.md` | `CLAUDE.md` importing `AGENTS.md` |
+| Custom agents | `~/.copilot/agents` (`--harness copilot`) | none, runs inline | `~/.claude/agents` (`--harness claude`) |
 
-1. Reload skills if it needs that, and confirm they are listed.
-2. `/setup-workflow` in each repo. It binds `tracker-local` until Jira access is approved.
-3. `/workflow` whenever you want the map.
+Skills use only `name`, `description` and `disable-model-invocation`, and say "subagent" rather than naming a harness feature. Where a harness has no subagents, review and implementation run inline from the prompts in `~/.agents/agents/`.
 
-## Plugins
-
-The repo is also a plugin for each harness. Skills and agents are shared, so only the manifests differ.
-
-| Harness | Manifest | Install |
-|---|---|---|
-| Claude Code | `.claude-plugin/` | `/plugin marketplace add JacobCGade/skills`, then `/plugin install agent-workflow@jacobcgade-skills` |
-| Copilot CLI | `plugin.json`, `.github/plugin/marketplace.json` | `/plugin marketplace add JacobCGade/skills`, then `copilot plugin install agent-workflow@jacobcgade-skills` |
-| Codex | `.codex-plugin/` | add the repo as a plugin source in Codex |
-
-Keep the version in all four manifests in step.
+**Then**, in your harness: reload skills if it needs that and confirm they are listed, run `/setup-workflow` in each repo (it binds `tracker-local` until Jira access is approved), and run `/workflow` whenever you want the map.
 
 ## Workflows
 
@@ -46,7 +50,11 @@ Do this once per repo.
 <details>
 <summary><strong>I want to build a new feature</strong></summary>
 
-`/grill` → `/to-tickets` → `/implement` → `/review` → `/open-pr` → `/pr-feedback` → `/retro`
+```mermaid
+flowchart LR
+  G["/grill"] --> T["/to-tickets"] --> I["/implement"] --> R["/review"] --> P["/open-pr"] --> F["/pr-feedback"] --> RT["/retro"]
+  G -.-> PR["prototype"]
+```
 
 1. `/grill` interviews you until no decision is left to assume. When a question needs a runnable answer, it detours through the `prototype` discipline.
 2. `/to-tickets` turns the alignment into a ticket plan. It creates the tickets only after you approve the plan.
@@ -60,7 +68,10 @@ Do this once per repo.
 <details>
 <summary><strong>I want to make a small change</strong></summary>
 
-`/implement` → `/review` → `/open-pr`
+```mermaid
+flowchart LR
+  I["/implement"] --> R["/review"] --> P["/open-pr"]
+```
 
 Skip the tickets: run `/implement` straight from the conversation, with no ref. Add `/grill` first if the request leaves decisions open.
 </details>
@@ -68,7 +79,12 @@ Skip the tickets: run `/implement` straight from the conversation, with no ref. 
 <details>
 <summary><strong>I'm picking up a ticket someone else wrote</strong></summary>
 
-`/read-ticket` → `/refine-ticket` (if it has gaps) → `/implement` → `/review` → `/open-pr`
+```mermaid
+flowchart LR
+  RT["/read-ticket"] -->|gaps| RF["/refine-ticket"] --> I["/implement"]
+  RT -->|ready| I
+  I --> R["/review"] --> P["/open-pr"]
+```
 
 1. `/read-ticket <ref>` reads the ticket with its parent, children, links and comments, checks it against the definition of ready, and writes the agent brief.
 2. `/refine-ticket <ref>` interviews you on the gaps and rewrites the ticket. It writes back only after you approve.
@@ -78,7 +94,10 @@ Skip the tickets: run `/implement` straight from the conversation, with no ref. 
 <details>
 <summary><strong>Something is broken</strong></summary>
 
-`debug` → `/review` → `/open-pr`
+```mermaid
+flowchart LR
+  D["debug"] --> R["/review"] --> P["/open-pr"]
+```
 
 1. Describe the failure. The `debug` discipline takes over: reproduce, find the cause, then fix, with a regression test through `tdd`.
 2. `/review` and `/open-pr` as usual.
@@ -87,7 +106,10 @@ Skip the tickets: run `/implement` straight from the conversation, with no ref. 
 <details>
 <summary><strong>I want to refactor or migrate something</strong></summary>
 
-`/refactor` → `/review` → `/open-pr`
+```mermaid
+flowchart LR
+  RF["/refactor"] --> R["/review"] --> P["/open-pr"]
+```
 
 1. `/refactor <target or ticket> [mode=…]` pins the current behaviour with tests, works in small green steps, moves callers over, then deletes the old path.
 2. `/review` and `/open-pr`. Behaviour must not change, so the spec axis checks exactly that.
@@ -96,7 +118,13 @@ Skip the tickets: run `/implement` straight from the conversation, with no ref. 
 <details>
 <summary><strong>I want to test an idea or make a proof of concept</strong></summary>
 
-`/spike` or `prototype` → ADR or `/to-tickets`
+```mermaid
+flowchart LR
+  Q{"open question"} -->|investigate| S["/spike"]
+  Q -->|code answers it faster| PR["prototype"]
+  S --> O["ADR or /to-tickets"]
+  PR --> O
+```
 
 - **A question to investigate:** `/spike <question>` is timeboxed. It ends in a cited findings note and your decision, recorded as an ADR or as tickets.
 - **A question that running code answers faster than discussion** (a library's real behaviour, performance, an API's responses, how a UI flow feels): ask for a prototype. The `prototype` discipline writes throwaway code in `.agents/prototypes/`, and you keep the answer, not the code.
@@ -150,21 +178,27 @@ It covers a new skill, a change to one, and an adapter for a new tool (Linear, G
 
 ## Design
 
-```mermaid
-flowchart TB
-  O["Orchestrators: you type them"] --> D["Disciplines: grill, prototype, tdd, lean, verify, debug"]
-  O --> P[("Ports: tracker, code-host")]
-  D --> P
-  P -.-> A1[tracker-local] & A2[tracker-jira] & A3[code-host-github]
-```
+The set takes you from an agreed idea to a merged change, with you making the decisions and the agent doing the legwork. It rests on a few principles.
 
-- **Harness-agnostic.** Skills live in `.agents/skills`, conventions in `AGENTS.md`, and nothing depends on one vendor's commands or paths. Custom agents are optional, and skills fall back to running inline when a harness has none.
-- **Ports and adapters.** Skills call tracker or code-host operations, and `.agents/workflow.md` binds each port to an adapter. Moving from local tickets to Jira means changing one line, plus a one-off CSV import (`tracker-local/scripts/tickets.py export-jira-csv`).
-- **Two audiences per ticket.** The ticket follows `to-tickets/ticket-template.md`: a short overview and acceptance criteria, written for humans. The agent brief (`.agents/briefs/<ref>.md`, template in `workflow/references/`) holds the detail a fresh agent needs. The ticket wins any conflict.
-- **You approve what others see:** ticket creation and rewrites, PR replies under your name, and releases.
-- **Overview by default.** Every slice writes a build-log entry and posts a digest. `/catch-me-up` rebuilds the big picture.
-- **Lean by default.** The lean discipline and the standards reviewer push back on speculative abstractions.
-- **Conventions stay out.** Stack rules (C#, TS, Tailwind) belong in `AGENTS.md`, which every harness reads (Claude Code via a `CLAUDE.md` containing `@AGENTS.md`). The standards reviewer reads it and any harness-specific instruction files.
+**Three layers.** Each layer only depends on the one below it.
+
+| Layer | What it is | Who starts it |
+|---|---|---|
+| Orchestrators | The workflows: `/grill`, `/implement`, `/review`, `/open-pr` and so on | You, by typing the command |
+| Disciplines | Habits the agent applies while it works: `tdd`, `lean`, `verify`, `debug`, `prototype` | The agent, when the situation matches |
+| Ports and adapters | Where the tracker and the code host get reached: `tracker-local`, `tracker-jira`, `code-host-github` | Skills, through `.agents/workflow.md` |
+
+**Principles**
+
+- **You decide, the agent does.** `/grill` settles open decisions before any building. Ticket creation and rewrites, PR replies under your name, and releases always wait for your approval.
+- **Gates never go away.** Each slice goes through tdd, lean and verify, and the change goes through review. The autonomy mode (collaborative, balanced, autopilot) only changes how often the agent stops to check in. Claims need evidence: "done" means the agent ran the check and showed the output.
+- **Fresh eyes review.** Two reviewers see only the diff, the spec and the standards, never the implementer's reasoning. One judges whether it does what the ticket asked, the other whether it follows the repo's standards and stays lean.
+- **Two audiences per ticket.** The ticket is short and written for humans. The agent brief (`.agents/briefs/<ref>.md`) holds the detail a fresh agent needs, and the ticket wins any conflict.
+- **Stay oriented.** Every slice writes a build-log entry and posts a digest. `/catch-me-up` rebuilds the big picture, and `/handoff` carries it to a new session.
+- **Swap tools in one line.** Moving from local tickets to Jira means changing the binding, plus a one-off CSV import (`tracker-local/scripts/tickets.py export-jira-csv`).
+- **Small and portable.** Lean is the default, so the agent pushes back on speculative abstractions. Skills live in `.agents/skills`, stack conventions live in `AGENTS.md`, and custom agents are optional.
+
+**How to use it.** Run `/setup-workflow` once per repo, then pick your situation under [Workflows](#workflows). Start in `collaborative` mode until you trust the loop, then move to `balanced`, and use `autopilot` for well-specified tickets.
 
 See `skills/writing-skills/references/patterns.md` for the research behind each choice.
 
@@ -180,20 +214,6 @@ See `skills/writing-skills/references/patterns.md` for the research behind each 
 | Disciplines (model-invoked) | `grill`, `prototype`, `tdd`, `lean`, `verify`, `debug` |
 | Adapters | `tracker-local`, `tracker-jira`, `code-host-github` |
 | Custom agents (optional) | `spec-reviewer`, `standards-reviewer`, `implementer` |
-
-## Local files (gitignored by `/setup-workflow`)
-
-`.agents/tickets/`, `.agents/briefs/`, `.agents/build-log.md` and `.agents/prototypes/`. The bindings file `.agents/workflow.md` is yours to commit or not. Never ignore `.agents/` as a whole, because harnesses load project skills from `.agents/skills/`.
-
-## Harness support
-
-| | Copilot CLI | Codex | Claude Code |
-|---|---|---|---|
-| Skills | `~/.agents/skills` | `~/.agents/skills` | `~/.claude/skills` (`--harness claude`) |
-| Repo conventions | `AGENTS.md` | `AGENTS.md` | `CLAUDE.md` importing `AGENTS.md` |
-| Custom agents | `~/.copilot/agents` (`--harness copilot`) | none, runs inline | `~/.claude/agents` (`--harness claude`) |
-
-Skills use only `name`, `description` and `disable-model-invocation`, and say "subagent" rather than naming a harness feature. Where a harness has no subagents, review and implementation run inline from the same prompts in `~/.agents/agents/`.
 
 ## Licence
 
