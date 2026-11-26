@@ -29,7 +29,7 @@ If the actual diff grows past twice the estimate, stop the slice. Split it or si
 
 ## 2. Parallel tickets (autopilot only)
 
-Tickets with no open blockers that touch disjoint modules can run in parallel. Use `/fleet`, or delegate each one to the `implementer` agent. Its kickoff contains the ticket's title, overview and acceptance criteria verbatim, the brief's path, the bindings path, and this skill's path. Tickets that share files run serially.
+Tickets with no open blockers that touch disjoint modules can run in parallel. Delegate each one to the `implementer` agent, or use the harness's parallel-subagent feature if it has one. With neither, run them serially. Its kickoff contains the ticket's title, overview and acceptance criteria verbatim, the brief's path, the bindings path, and this skill's path. Tickets that share files run serially.
 
 Only this session touches the tracker, the build log and the briefs' Progress sections. You own every delegated diff: read it and rerun [verify](../verify/SKILL.md) yourself. A subagent's "done" is a claim, not evidence.
 

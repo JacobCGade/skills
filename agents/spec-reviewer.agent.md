@@ -1,7 +1,6 @@
 ---
 name: spec-reviewer
 description: Fresh-context reviewer that checks whether a diff does what its ticket asked, no more and no less. Dispatched by the review skill.
-tools: ["read", "search", "execute"]
 user-invocable: false
 ---
 

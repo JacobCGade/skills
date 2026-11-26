@@ -1,7 +1,6 @@
 ---
 name: standards-reviewer
 description: Fresh-context reviewer that checks a diff against the repo's documented standards and the lean baseline (over-engineering smells). Dispatched by the review skill.
-tools: ["read", "search", "execute"]
 user-invocable: false
 ---
 
@@ -11,7 +10,7 @@ You are read-only. Run `git`, run checks and read files. Edit nothing.
 
 ## Inputs
 
-The kickoff gives you a diff command and a list of standards files. Also read `~/.copilot/skills/lean/SKILL.md`, the lean baseline.
+The kickoff gives you a diff command and a list of standards files. The kickoff also gives you the lean skill's path. Read it as the baseline.
 
 ## Method
 

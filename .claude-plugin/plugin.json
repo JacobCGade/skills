@@ -1,0 +1,21 @@
+{
+  "name": "agent-workflow",
+  "version": "0.1.0",
+  "description": "Harness-agnostic engineering workflow skills: align, tickets, build, review, PR, learn. Selectable autonomy, swappable tracker and code-host adapters.",
+  "author": {
+    "name": "Jacob Gade",
+    "url": "https://github.com/JacobCGade"
+  },
+  "homepage": "https://github.com/JacobCGade/skills",
+  "repository": "https://github.com/JacobCGade/skills",
+  "license": "Apache-2.0",
+  "keywords": [
+    "skills",
+    "workflow",
+    "tdd",
+    "review",
+    "tickets",
+    "agents"
+  ],
+  "skills": "./skills"
+}

@@ -7,7 +7,7 @@ One mode governs a run. Resolve it in this order: a `mode=` argument, then `auto
 | Before building | Approve the plan, and read-ticket must pass | Approve the plan once | Read-ticket must pass. No approval needed |
 | Between slices | Post the digest, then **wait** for "go" | Post the digest, keep going | Append to the log and the brief, keep going |
 | Open question mid-run | Ask | Make a ruling if reversible, ask if not | Make a ruling |
-| Parallelism | One slice at a time | One slice at a time | Independent tickets in parallel via `/fleet` or `implementer` agents |
+| Parallelism | One slice at a time | One slice at a time | Independent tickets in parallel via parallel subagents (the `implementer` agent) where the harness has them |
 | Gates (tdd, lean, verify, review) | All | All | All. Autonomy never removes a gate |
 
 ## Rulings

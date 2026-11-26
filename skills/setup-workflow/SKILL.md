@@ -16,7 +16,7 @@ Answer from the repo. Ask the user only for what you can't observe.
 - **Code host:** `git remote -v` should point at GitHub. Confirm with `gh auth status`.
 - **Tracker:** is the Atlassian MCP connected in this session, or is `acli` installed and logged in? If neither, recommend `tracker-local`.
 - **Checks:** read `*.sln`, `*.csproj`, `Directory.Build.props`, the `package.json` scripts and the CI workflows. Take each command from what CI runs, so local and CI agree.
-- **Docs:** an existing ADR folder, glossary, `AGENTS.md`, `.github/copilot-instructions.md`, `.github/instructions/`.
+- **Docs:** an existing ADR folder, glossary, `AGENTS.md` (plus any harness-specific files such as `CLAUDE.md`, `.github/copilot-instructions.md` or `.github/instructions/`).
 
 ## 2. Confirm, one section at a time
 
@@ -31,7 +31,7 @@ Lead each section with your recommendation, so the user can accept it in one wor
 ## 3. Write
 
 - The bindings file.
-- `.gitignore` entries for every local path: `docs.briefs`, `docs.build-log`, `docs.prototypes`, and `tracker-local.dir` when it is bound. Add each path on its own line. Never ignore `.agents/` as a whole, because Copilot loads project skills from `.agents/skills`.
+- `.gitignore` entries for every local path: `docs.briefs`, `docs.build-log`, `docs.prototypes`, and `tracker-local.dir` when it is bound. Add each path on its own line. Never ignore `.agents/` as a whole, because harnesses load project skills from `.agents/skills`.
 - A two-line pointer in `AGENTS.md`, created if missing. It is loaded on every turn, so keep it this short:
 
   ```markdown

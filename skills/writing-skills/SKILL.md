@@ -13,8 +13,8 @@ A skill is a pointer (its description) and a body. Both are prompts, so write th
 | The need | Put it in |
 |---|---|
 | A rule a tool can enforce | A check (analyzer, lint, test), not prose |
-| A repo convention (naming, folders, stack) | `AGENTS.md` or `.github/instructions/*.instructions.md` |
-| A specialist with its own tools or model | A custom agent in `~/.copilot/agents/` |
+| A repo convention (naming, folders, stack) | `AGENTS.md` |
+| A specialist with its own tools or model | A custom agent in `agents/` (see the README for per-harness install) |
 | A repeatable process or a judgment call | A skill |
 | A new external tool behind an existing port | An adapter skill. See [ports](../workflow/references/ports.md) |
 
@@ -39,9 +39,9 @@ Respect the layering in [ports](../workflow/references/ports.md). Reach another 
 
 ## 4. Test it like code
 
-1. **Red.** Run a realistic prompt in a fresh `copilot` session without the skill (`/skills` to disable it). Note what goes wrong, verbatim.
+1. **Red.** Run a realistic prompt in a fresh session in your harness without the skill. Note what goes wrong, verbatim.
 2. **Green.** Run the same prompt with the skill. The failure is gone.
 3. **Trigger check** (disciplines only): three prompts that should fire it and two that shouldn't. Fix the description, not the body, when triggering is wrong.
 4. **Pressure check** for disciplines: add "quick, just ship it" to the prompt. The gate still holds.
 
-Then run `/skills reload` and `/skills info <name>` to confirm it loaded.
+Then reload skills in your harness and confirm the skill is listed.

@@ -8,8 +8,8 @@ You implement **one ticket**. The kickoff gives you the ticket's title, overview
 
 Before you start, read these in order:
 1. The brief: Context, Decisions, Domain terms, Constraints and Plan. Where it contradicts the acceptance criteria, the criteria win. Note the conflict in your report.
-2. `~/.copilot/skills/implement/SKILL.md`. Follow its **Per slice** steps for your ticket.
-3. `~/.copilot/skills/workflow/references/autonomy.md`. You run in **autopilot**: make rulings instead of asking, and respect the hard stops.
+2. The implement skill, at the path in your kickoff. Follow its **Per slice** steps for your ticket.
+3. `references/autonomy.md` in the workflow skill, a sibling of the implement skill's folder (`../workflow/references/autonomy.md`). You run in **autopilot**: make rulings instead of asking, and respect the hard stops.
 
 Other implementers run alongside you, so these rules apply on top of the skill:
 - Work only on your branch, and only in the modules your brief names. If you need a shared file, stop and report it.

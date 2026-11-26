@@ -15,12 +15,14 @@ Use the argument if one was given. Otherwise use the merge-base with `branch.bas
 ## 2. Gather sources
 
 - **Spec:** the ticket refs from commit messages or the branch name. Fetch each with the tracker's `get` (see [ports](../workflow/references/ports.md)) for its acceptance criteria, and read the Decisions and Constraints in its brief. For a change agreed in chat, use the agreed summary. If there is no spec at all, the spec axis reports "no spec".
-- **Standards:** `AGENTS.md`, `.github/copilot-instructions.md`, `.github/instructions/*.instructions.md`, `CONTRIBUTING.md`, `CODING_STANDARDS.md` and the ADRs in the touched area, with [lean](../lean/SKILL.md) as the baseline. A documented repo standard overrides the lean baseline.
+- **Standards:** `AGENTS.md` and any harness-specific instruction files (`CLAUDE.md`, `.github/copilot-instructions.md`, `.github/instructions/*.instructions.md`), `CONTRIBUTING.md`, `CODING_STANDARDS.md` and the ADRs in the touched area, with [lean](../lean/SKILL.md) as the baseline. A documented repo standard overrides the lean baseline.
 
 ## 3. Dispatch both reviewers in parallel
 
 - `spec-reviewer` agent: the diff command, the acceptance criteria verbatim, and the brief's path.
-- `standards-reviewer` agent: the diff command and the list of standards file paths.
+- `standards-reviewer` agent: the diff command, the list of standards file paths, and the path to the [lean](../lean/SKILL.md) skill.
+
+If the harness has no custom agents, run each review yourself in turn from the plugin's or installer's `agents/<name>.agent.md` (`~/.agents/agents/` after `install.sh`), but prefer a subagent: the fresh context is the point.
 
 Pass file paths and commands. The acceptance criteria are the one thing you paste in full, because local tickets aren't reachable from the agent.
 

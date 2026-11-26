@@ -36,13 +36,15 @@ All of them converge on the same spine: **align → spec → slice → TDD build
 - **Adversarial "prove it with a run" review** (pstack `interrogate`). It overlaps the two-axis review, and you chose the latter.
 - **Mandatory skill checks before every message** (superpowers `using-superpowers`). That is heavy context load on every turn, and it fights a selectable-autonomy design.
 - **Refactor inside the TDD loop.** Like Matt Pocock, this set keeps refactoring out of the loop: the loop is red, green, lean, and structural change goes to `/refactor` or to review.
-- **Per-vendor model routing** (pstack). Copilot CLI picks the model per custom agent. Set `model:` on an agent if you need it.
+- **Per-vendor model routing** (pstack). Harnesses that pick a model per custom agent let you set `model:` on an agent, but that is not portable, so this set leaves it out.
 - **Large monolithic skills** (Addy's ~300 lines). They are harder to compose and harder to keep relevant.
 
-## Copilot CLI facts these skills rely on
+## Harness facts these skills rely on
 
-- Personal skills live in `~/.copilot/skills` or `~/.agents/skills`. Project skills live in `.github/skills`, `.claude/skills` or `.agents/skills`.
-- The documented frontmatter is `name`, `description`, `license` and `allowed-tools`. `disable-model-invocation` is honoured in practice and documented for custom agents. Confirm a skill's state with `/skills info`.
-- You invoke a skill explicitly by typing `/skill-name` in a prompt. `/skills reload` picks up changes.
-- Custom agents are `~/.copilot/agents/<id>.agent.md`, with frontmatter `name`, `description`, `tools`, `model`, `disable-model-invocation` and `user-invocable`. Tool aliases: `read`, `edit`, `search`, `execute`, `agent`, `web`, `todo`. The main agent can delegate to them as subagents with their own context window.
-- Built-ins worth composing with, not duplicating: `/plan`, `/fleet` (parallel subagents), `/review`, `/research`, `/autopilot`, `/compact`, `/share`.
+Only the lowest common denominator is assumed, so the set works in GitHub Copilot CLI, Codex and Claude Code.
+
+- The skill format is the open Agent Skills one: a folder with `SKILL.md`, frontmatter `name` and `description`, optional `disable-model-invocation`. Unknown keys are ignored.
+- **Skill locations.** `.agents/skills/` (project) and `~/.agents/skills/` (personal) are read by Copilot CLI and Codex. Claude Code reads `.claude/skills/` and `~/.claude/skills/` instead, so `install.sh --harness claude` installs there too.
+- **Instructions.** `AGENTS.md` is the single source of repo conventions. Claude Code reads `CLAUDE.md`, so a one-line `CLAUDE.md` that imports `@AGENTS.md` bridges it.
+- **Custom agents** are optional. The `agents/*.agent.md` prompts use only `name` and `description`, and no tool list. Copilot reads them from `~/.copilot/agents/` and Claude Code from `~/.claude/agents/` (the installer handles both). Codex has its own agent format, so there the skills fall back to running the review or implementation inline.
+- Built-ins differ per harness (plan mode, parallel subagents, review commands). Compose with them when present, and never depend on one.
