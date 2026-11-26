@@ -14,7 +14,7 @@ A harness-agnostic engineering workflow for any coding agent (GitHub Copilot CLI
 
 <!-- Maintainers: keep the version in plugin.json, .claude-plugin/*.json, .codex-plugin/plugin.json and .github/plugin/marketplace.json in step. -->
 
-**Or with the installer**, which also works from a local checkout:
+**Or with the installer:**
 
 ```bash
 ./install.sh                      # skills into ~/.agents/skills
