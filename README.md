@@ -4,7 +4,7 @@ A harness-agnostic engineering workflow for any coding agent (GitHub Copilot CLI
 
 ## Install
 
-**As a plugin** (once the repo is on GitHub):
+**As a plugin:**
 
 | Harness | Install |
 |---|---|
