@@ -30,22 +30,123 @@ The repo is also a plugin for each harness. Skills and agents are shared, so onl
 
 Keep the version in all four manifests in step.
 
-## Flows
+## Workflows
 
-```mermaid
-flowchart LR
-  grill["/grill"] --> tt["/to-tickets"] --> impl["/implement mode=…"] --> rev["/review"] --> pr["/open-pr"] --> fb["/pr-feedback"]
-  pr --> retro["/retro"]
-  rt["/read-ticket"] --> rf["/refine-ticket"] --> impl
-  bug["debug"] --> rev
-  ref["/refactor"] --> rev
-  spike["/spike"] --> tt
-  rel["/release"]
-  proto["prototype"] -.-> grill
-  proto -.-> spike
-```
+Pick the situation you are in and open its section. Each workflow lists the skills to run and in what order. Commands you type start with `/`. The rest are disciplines (`tdd`, `lean`, `verify`, `debug`, `prototype`) that the agent applies on its own, so you never type them. Run `/workflow` at any time for the same map inside your agent.
 
-Inside `/implement`, each slice goes red → green → lean → verify → commit → log. After each slice the autonomy mode decides: wait for you (collaborative), post a digest and continue (balanced), or log rulings and continue (autopilot).
+<details>
+<summary><strong>I'm setting up a new repo</strong></summary>
+
+1. `/setup-workflow` binds the tracker (`tracker-local` until you have Jira access), the code host, your check commands, the autonomy default, and the gitignore entries.
+2. Optionally `/setup-workflow personal` for defaults that follow you across repos.
+
+Do this once per repo.
+</details>
+
+<details>
+<summary><strong>I want to build a new feature</strong></summary>
+
+`/grill` → `/to-tickets` → `/implement` → `/review` → `/open-pr` → `/pr-feedback` → `/retro`
+
+1. `/grill` interviews you until no decision is left to assume. When a question needs a runnable answer, it detours through the `prototype` discipline.
+2. `/to-tickets` turns the alignment into a ticket plan. It creates the tickets only after you approve the plan.
+3. `/implement <ref> [mode=collaborative|balanced|autopilot]` reads the ticket, then works slice by slice. Each slice goes red → green → lean → verify → commit → log. After each slice the autonomy mode decides: wait for you (collaborative), post a digest and continue (balanced), or log rulings and continue (autopilot).
+4. `/review` runs two fresh-context reviewers, one for the spec and one for the standards.
+5. `/open-pr` opens the pull request with the change, the evidence and the risk.
+6. `/pr-feedback` when reviewers comment. You decide on each thread, and it posts only the replies you approved.
+7. `/retro` turns the session's mistakes into checks, types or sharper skills.
+</details>
+
+<details>
+<summary><strong>I want to make a small change</strong></summary>
+
+`/implement` → `/review` → `/open-pr`
+
+Skip the tickets: run `/implement` straight from the conversation, with no ref. Add `/grill` first if the request leaves decisions open.
+</details>
+
+<details>
+<summary><strong>I'm picking up a ticket someone else wrote</strong></summary>
+
+`/read-ticket` → `/refine-ticket` (if it has gaps) → `/implement` → `/review` → `/open-pr`
+
+1. `/read-ticket <ref>` reads the ticket with its parent, children, links and comments, checks it against the definition of ready, and writes the agent brief.
+2. `/refine-ticket <ref>` interviews you on the gaps and rewrites the ticket. It writes back only after you approve.
+3. `/implement <ref>`, then continue as in the feature workflow.
+</details>
+
+<details>
+<summary><strong>Something is broken</strong></summary>
+
+`debug` → `/review` → `/open-pr`
+
+1. Describe the failure. The `debug` discipline takes over: reproduce, find the cause, then fix, with a regression test through `tdd`.
+2. `/review` and `/open-pr` as usual.
+</details>
+
+<details>
+<summary><strong>I want to refactor or migrate something</strong></summary>
+
+`/refactor` → `/review` → `/open-pr`
+
+1. `/refactor <target or ticket> [mode=…]` pins the current behaviour with tests, works in small green steps, moves callers over, then deletes the old path.
+2. `/review` and `/open-pr`. Behaviour must not change, so the spec axis checks exactly that.
+</details>
+
+<details>
+<summary><strong>I want to test an idea or make a proof of concept</strong></summary>
+
+`/spike` or `prototype` → ADR or `/to-tickets`
+
+- **A question to investigate:** `/spike <question>` is timeboxed. It ends in a cited findings note and your decision, recorded as an ADR or as tickets.
+- **A question that running code answers faster than discussion** (a library's real behaviour, performance, an API's responses, how a UI flow feels): ask for a prototype. The `prototype` discipline writes throwaway code in `.agents/prototypes/`, and you keep the answer, not the code.
+- If the answer says build it, go on with `/to-tickets` or the feature workflow.
+</details>
+
+<details>
+<summary><strong>I want to add tests</strong></summary>
+
+Ask for tests, or for a test-first build. The `tdd` discipline works at the seams (red → green), and `verify` makes the agent show its test run before it claims anything passes. For tests as part of a feature, use the feature workflow. They happen inside every `/implement` slice.
+</details>
+
+<details>
+<summary><strong>A PR has review comments</strong></summary>
+
+`/pr-feedback [PR]`
+
+It proposes fix, reply or skip per thread and drafts the replies. You write the words and approve each one. Then `/implement` or `/review` for any fixes it asked for.
+</details>
+
+<details>
+<summary><strong>I want to ship a release</strong></summary>
+
+`/release [since <tag>] [version]`
+
+It collects the merged PRs since the last tag, drafts the notes and a semver version, and publishes only after you approve.
+</details>
+
+<details>
+<summary><strong>I lost track, or I'm switching sessions</strong></summary>
+
+- **Lost track of what was built:** `/catch-me-up [since <ref> | <ticket> | today | explain <thing>]` rebuilds the overview and says where to start reading.
+- **Session is full, or you're switching agents:** `/handoff [what the next session will do]` writes a document a fresh session can continue from.
+</details>
+
+<details>
+<summary><strong>I want to learn from a session</strong></summary>
+
+`/retro`
+
+Run it in the session it covers, or pass an exported session file. It turns mistakes, corrections and slow spots into changes to the environment, most severe first.
+</details>
+
+<details>
+<summary><strong>I want to change these skills or add an adapter</strong></summary>
+
+`/writing-skills <what you want>`
+
+It covers a new skill, a change to one, and an adapter for a new tool (Linear, GitLab and so on).
+</details>
 
 ## Design
 
